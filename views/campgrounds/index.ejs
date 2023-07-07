@@ -1,0 +1,132 @@
+<% layout('layouts/boilerplate') %>
+
+    <!-- leaflet css -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
+
+    <!-- markercluster  -->
+    <link rel="stylesheet" href="../stylesheets/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="../stylesheets/dist/MarkerCluster.Default.css"/>
+
+
+
+    <div id="map"></div>
+
+
+
+    <h1>All Campgrounds</h1>
+    <div>
+        <a href="/campgrounds/new">Add Campground</a>
+    </div>
+    <% for(let campground of campgrounds) { %>
+        <div class="card mb-3" >
+            <div class="row">
+                <div class="col-md-4">
+                   <%  try { %> 
+                    <img class="img-fluid" alt="" src="<%=campground.images[0].url%>">
+                     <%  } catch (error) { %> 
+                 
+                    <% }  %>
+                     
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <% campground.tittle %>
+                        </h5>
+                        <p class="card-text">
+                            <%= campground.description %>
+                        </p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                <%= campground.location %>
+                            </small>
+                        </p>
+                        <a class="btn btn-primary" href="/campgrounds/<%= campground._id %>">View <%= campground.tittle
+                                %> </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+
+        <script>
+            const campgrounds = <%- JSON.stringify(campgrounds) %>
+        </script>
+
+            <!-- geojson data  -->
+           <!--  <script src="../stylesheets/dist/data.js"></script> -->
+            <script src="../stylesheets/dist/datos.js"></script>
+
+            <!-- leaflet js  -->
+            <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+
+            <!-- markercluster  -->
+            <script src="../stylesheets/dist/leaflet.markercluster.js"></script>
+
+
+
+
+            <script>
+                const map = L.map("map").setView([38.416449, -3.546857], 2);
+                const osm = L.tileLayer(
+                    "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
+                    {
+                        maxZoom: 19,
+                        attribution:
+                            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    }
+                ).addTo(map);
+
+
+
+                const geojsonMarkerOptions = {
+                    radius: 8,
+                    fillColor: "#71AFED",
+                    color: "#71AFED",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8,
+                };
+
+                
+
+
+                const markers = new L.MarkerClusterGroup();
+
+
+
+                // loading geojson
+                L.geoJSON(data, {
+                    
+
+                    onEachFeature: function (feature, layer) {
+                        
+                        const popupContent =
+                            '<h4 class = "text-primary">CampGround</h4>' +
+                            '<div class="container"><table class="table table-striped">' +
+                            "<thead><tr><th>Properties</th><th>Value</th></tr></thead>" +
+                            "<tbody><tr><td> Title </td><td>" +
+                            feature.properties.title +
+                            "</td></tr>" +
+                            "<tr><td>Price </td><td>" +
+                            feature.properties.price +
+                            "</td></tr>" +
+                            "<tr><td> Location </td><td>" +
+                            feature.properties.location +
+                            "</td></tr>";
+                        layer.bindPopup(popupContent);
+                    },
+
+                    pointToLayer: function (feature, latlng) {
+                        return markers.addLayer(L.circleMarker(latlng, geojsonMarkerOptions))
+                    }
+                }).addTo(map);
+
+                //Se colocan los marker normal como yo lo sé hacer 
+                /* L.geoJSON(data).addTo(map); */
+
+                /* marker clustering */
+                map.addLayer(markers);
+
+            </script>
