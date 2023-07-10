@@ -45,7 +45,6 @@ const db_url_local =  'mongodb://localhost:27017/yelp-camp';
 // process.env.DB_URL ||
 /* 'mongodb://localhost:27017/yelpcamp' */
 
-console.log(db_url_local);
 
 mongoose.connect(/* db_url */db_url, { useNewUrlParser: true, useUnifiedTopology: true })
 
